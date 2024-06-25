@@ -1,0 +1,32 @@
+Sub ListSheetsFromFiles()
+    Dim ws As Worksheet
+    Dim wb As Workbook
+    Dim targetWb As Workbook
+    Dim filePath As String
+    Dim lastRow As Long
+    Dim currentRow As Long
+    Dim outputRow As Long
+    
+    Set ws = ThisWorkbook.Sheets(1) ' 必要に応じてシートを明示的に指定できます
+    
+    lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row ' A列の最後の行を取得
+    
+    For currentRow = 1 To lastRow
+        filePath = "D:\" & ws.Cells(currentRow, 1).Value ' ファイルパスを組み合わせる
+        
+        If Dir(filePath) <> "" Then ' ファイルが存在するか確認
+            Set targetWb = Workbooks.Open(filePath) ' ワークブックを開く
+            
+            outputRow = currentRow
+            
+            For Each wb In targetWb.Worksheets ' ワークブック内の各シートをループ
+                ws.Cells(outputRow, 2).Value = wb.Name ' シート名をB列に出力
+                outputRow = outputRow + 1
+            Next wb
+            
+            targetWb.Close SaveChanges:=False ' ワークブックを閉じる
+        Else
+            ws.Cells(currentRow, 2).Value = "File not found" ' ファイルが見つからない場合
+        End If
+    Next currentRow
+End Sub
